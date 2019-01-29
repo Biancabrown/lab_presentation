@@ -207,7 +207,6 @@ remove sequences that are shorter than those length
 
 Image if we had a 300 bp sequences
 
-![alt-text-1](https://raw.githubusercontent.com/Biancabrown/lab_presentation/master/image_5.jpeg)
 
 
 We are still doing Miseq 250 paired end
