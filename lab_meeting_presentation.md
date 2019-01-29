@@ -3,9 +3,9 @@
 ## January 29, 2019 
 
 
-This tutorial reviews the general workflow of a dada2 metabarcoding analysis pipeline, and several flavors of analysis that are commonly used in the Kartzinel lab at this time. 
+### This tutorial reviews the general workflow of a dada2 metabarcoding analysis pipeline, and several flavors of analysis that are commonly used in the Kartzinel lab at this time. 
 
-##DADA2
+### DADA2
 Traditionally, sequence reads are clustered into operational taxonomic units (OTUs) at a defined identity threshold to avoid sequencing errors generating spurious taxonomic units. 
 
 There have been numerous bioinformatic methods recently released that attempt to correct sequencing errors to determine real biological sequences at single nucleotide resolution by generating amplicon sequence variants (ASVs). A widely used pipeline for this type of analysis is called dada2.
