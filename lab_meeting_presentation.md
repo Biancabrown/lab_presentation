@@ -1,4 +1,9 @@
-Bianca Palmer Brown Lab Meeting Presentation - January 29, 2019 - This tutorial reviews the general workflow of a dada2 metabarcoding analysis pipeline, and several flavors of analysis that are commonly used in the Kartzinel lab at this time. 
+## Bianca Palmer Brown 
+## Lab Meeting Presentation 
+## January 29, 2019 
+
+
+This tutorial reviews the general workflow of a dada2 metabarcoding analysis pipeline, and several flavors of analysis that are commonly used in the Kartzinel lab at this time. 
 
 ##DADA2
 Traditionally, sequence reads are clustered into operational taxonomic units (OTUs) at a defined identity threshold to avoid sequencing errors generating spurious taxonomic units. 
@@ -71,7 +76,8 @@ A similar class of methods developed for 454-scale data was typically used to â€
 
 ###In this section, we will provide a general strategy for bringing the fastq data files into the dada2 pipeline, completing the denoising steps, and assigning taxonomy to the ASVs. There are two options: (i) to run this code locally on your personal computer or (ii) to run this code on a cluster like "Oscar" at Brown University. 
  
-R based
+###R
+
 
 ```
 library(dada2); packageVersion("dada2")
@@ -223,7 +229,7 @@ So we will get odd overlaps etc.
 Instead using dada2 to remove primers, some people are usng cut adapt. 
 
 
-##Cut Adapt in R
+## Cut Adapt in R
 
 ```{r}
 
@@ -261,7 +267,7 @@ rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs[[1]]),
 
 
 
-###Cut adapt Oscar 
+## Cut adapt Oscar 
 
 ```
 
@@ -301,7 +307,7 @@ done
 ```
 
 
-#After running cut adapt, you can run your dada2 code:
+## After running cut adapt, you can run your dada2 code:
 
 If running it on your computer, you can use Brian's script with some modification: 
 
@@ -402,7 +408,7 @@ save.image("DADA2_Output_2.R")
 
 
 
-##If running on oscar then we you need to do the following steps:
+## If running on oscar then we you need to do the following steps:
 
 1. Write a R script dada2
 2. Write a bash script and include the cutadapt code and dada2 code within that R script. 
@@ -507,7 +513,7 @@ saveRDS(dadaRs, "/gpfs_home/bbrown3/data/bbrown3/MSU_READS/dada_20161227_16S_V4_
 
 
 
-###After writing R script, you write a bash script. If we were only going to call the bash script 
+## After writing R script, you write a bash script. If we were only going to call the bash script 
 
 General Structure of a bash script
 
