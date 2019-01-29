@@ -10,12 +10,14 @@ Traditionally, sequence reads are clustered into operational taxonomic units (OT
 
 There have been numerous bioinformatic methods recently released that attempt to correct sequencing errors to determine real biological sequences at single nucleotide resolution by generating amplicon sequence variants (ASVs). A widely used pipeline for this type of analysis is called dada2.
 
+Nearing et al.(2018) https://www.ncbi.nlm.nih.gov/pubmed/30123705
+
 *remember to cite*
 
 1. DADA2 is for modeling and correcting Illumina-sequenced amplicon errors 
 2. Infers sample sequences exactly and resolves differences of as little as 1 nucleotide.
 
-*remember to cite*
+Callahan at al. (2016) https://www.nature.com/articles/nmeth.3869
 
 ### This image represents a target amplicon locus with primers, which will be sequenced on an Illumina platform.
 
