@@ -428,7 +428,7 @@ R script are written in R
 ```
 
 
-###Other things I will like to point out using our dada2 rscript
+### Other things I will like to point out using our dada2 rscript
 
 
 ```
@@ -539,7 +539,7 @@ blah blah code
 
 Structure of a bash script using cut adapt and dada2 
 
-##Patrick's Example
+### Patrick's Example
 
 ```
 
