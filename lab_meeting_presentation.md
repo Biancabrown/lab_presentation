@@ -1,24 +1,18 @@
-Bianca Palmer Brown Lab Meeting Presentation 
+Bianca Palmer Brown Lab Meeting Presentation - January 29, 2019 - This tutorial reviews the general workflow of a dada2 metabarcoding analysis pipeline, and several flavors of analysis that are commonly used in the Kartzinel lab at this time. 
 
 ##DADA2
-
 Traditionally, sequence reads are clustered into operational taxonomic units (OTUs) at a defined identity threshold to avoid sequencing errors generating spurious taxonomic units. 
 
-There have been numerous bioinformatic methods recently released that attempt to correct sequencing errors to determine real biological sequences at single nucleotide resolution by generating amplicon sequence variants (ASVs).
+There have been numerous bioinformatic methods recently released that attempt to correct sequencing errors to determine real biological sequences at single nucleotide resolution by generating amplicon sequence variants (ASVs). A widely used pipeline for this type of analysis is called dada2.
 
 *remember to cite*
 
-
 1. DADA2 is for modeling and correcting Illumina-sequenced amplicon errors 
-
 2. Infers sample sequences exactly and resolves differences of as little as 1 nucleotide.
 
 *remember to cite*
 
-
-### Target amplicon with primers
-
-
+### This image represents a target amplicon locus with primers, which will be sequenced on an Illumina platform.
 
 ![alt-text-1](https://raw.githubusercontent.com/Biancabrown/lab_presentation/master/primer.jpeg)
 
@@ -27,17 +21,15 @@ amplicon is in black
 Total length is 250 bp
 
 
-### Seuqencing 
+### This image represents a demultiplexed sequence after Illumina sequencing.
 
 ![alt-text-1](https://raw.githubusercontent.com/Biancabrown/lab_presentation/master/image_2.jpeg "title-1")
 
-### Multiple sequences of different amplicons  
+### This image represents multiple sequences within a single sample.  
 ![alt-text-1](https://raw.githubusercontent.com/Biancabrown/lab_presentation/master/image_3.jpeg "title-1")
 
 
-
-
-We get those sequences in a fastq file. We get a fastq file for each of samples 
+When Illumina sequencing is complete, we recieve sample data in a "demultiplexed" state, which corresponds to one (in the case of single-end sequencing) or two (in the case of paired-end sequencing) fastq files. Below is an example of what a few lines of a fastq file look like. 
 
 ```
 Sample 1
@@ -65,20 +57,19 @@ TACGGAGGATGCGAGCGTTATCCGGATTTATTGGGTTTAAAGGGTGCGTAGGCGGGTTGCTAAGTCAGTGGTAAAAGCGT
 
 ```
 
-WE use dada2 to do the following:
+Our general bioinformatic workflow uses dada2 to process the fastq files from each sequencing run. The pipeline needs to be applied to the set of samples from each sequencing library separately, and projects involving many sequencing libraries can be combined after this portion of the pipeline is complete. We begin by following this series of steps:
 
-1. Check sequence quality
-2. Trim primers (can also be used with cut adapt
-3. Remove sequences that are not a particular length
-4. Check for errors
-5. Dereplicate
+1. Summarize the sequence quality 
+2. Trim primers (there are multiple flavors for this step, depending on the length of the target sequences can also whether or not we used single- or paired-end sequencing to generate the data; more details below)
+3. Remove sequences that are clearly errors (e.g., based on target length)
+4. Check for errors using the dada2 function
+5. Dereplicate the sequences
 6. Remove chimeras 
 7. Assign taxonomy
 
 A similar class of methods developed for 454-scale data was typically used to ‘denoise’ sequencing data prior to constructing OTUs (Quince et al., 2011), while new ASV methods are explicitly intended to replace OTUs as the atomic unit of analysis.
 
-
-###General code
+###In this section, we will provide a general strategy for bringing the fastq data files into the dada2 pipeline, completing the denoising steps, and assigning taxonomy to the ASVs. There are two options: (i) to run this code locally on your personal computer or (ii) to run this code on a cluster like "Oscar" at Brown University. 
  
 R based
 
@@ -145,25 +136,26 @@ sample.names <- sapply(strsplit(basename(fnFs), "_"), `[`, 1)
 ```
 
 
-Where our code differs and why?  
+Within the Kartzinel lab, we have many projects. Some projects are single-end reads, whereas others involve paired-end sequencing. Some projects have short and length-variable markers, whereas other projects use longer and single-length markers. The following lines show the key ways that we modify the dada2 pipeline to accomodate these different types of projects.
 
 ```
 
-Bianca microbiome
+We often use the 515/806 primers to amplify and sequence the 16S-V4 rRNA locus to analyze bacterial diversity and composition (i.e., microbiome). This marker is fixed-length and completely sequenced using paired-end sequencing with a XXX-cycle kit on the MiSeq. Therefore, we can truncate the sequence outputs at known positions by trimming the primers (trimLeft flag) and declaring the expected length of forward and reverse reads (truncLen flag).
 
 out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs,trimLeft = c(19, 20), truncLen=c(231,230),maxN=0, maxEE=c(2,2), truncQ=2, rm.phix=TRUE, compress=TRUE, multithread=TRUE)
 saveRDS(out, "out.rds")
 
-Courtney Plant
+In many of our past and ongoing studies, we have generated data that require us to use a program like 'cutadapt' or 'NGSfilter' (in Obitools). Examples inlcude highly-plexed trnL-P6 experiments run on a HiSeq and demultiplexed using Obitools prior to quality filtering using dada2 and/or very long reads that are not completley sequenced using selected Illumina protocol. Here are examples of how we apply the filterAndTrim line in cases where primers have been removed previously, or cannot be removed using the trimLeft flag as described above. 
 
-filterAndTrim(file.path(path,fns), file.path(filtpath,fns),maxN=0, maxEE=1, truncQ=2, rm.phix=TRUE,compress=TRUE, verbose=TRUE, multithread=TRUE)
+This is an example used for trnL-P6, single-end sequencing data, with primers removed previously using the Obitools function 'NGSfilter'
 
-Patrick 
+out<-filterAndTrim(file.path(path,fns), file.path(filtpath,fns),maxN=0, maxEE=1, truncQ=2, rm.phix=TRUE,compress=TRUE, verbose=TRUE, multithread=TRUE)
+
+This is an example used for trnL-P6, paired-end sequencing data, with primers removed previously using the 'cutadapt' function.
 
 out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs, maxN=0, maxEE=c(2,2), truncQ=2, minLen=8, rm.phix=TRUE, compress=TRUE, multithread=TRUE)
-saveRDS(out, "out.rds")
 
-Brian CO1
+This is an example used for COI, paired-end sequencing data, with primers removed previously using the 'cutadapt' function, because the paired-end sequences are shorter than required to sequence both the forward and reverse reads in their entirety (i.e., spanning both forward and reverse primers on both strands, as detailed in the figures below).
 
 out <- filterAndTrim(cutFs, filtFs, cutRs, filtRs, maxN = 0, maxEE = c(2, 2), 
     truncQ = 2, minLen = 50, rm.phix = TRUE, compress = TRUE, multithread = TRUE)
@@ -173,10 +165,10 @@ out <- filterAndTrim(cutFs, filtFs, cutRs, filtRs, maxN = 0, maxEE = c(2, 2),
 
 
 
-Main reason:
+Recapping the main reasons that we modify the filterAndTrim step to match common protocols used in the lab:
 
-1. Variation in size of our amplicon regions
-2. How we choose to remove our primers
+1. There is variation in the size of our amplicons 
+2. We have used multiple sequencing library strategies, which place different technical requirements on when and how we choose  remove our primers from the sequence data. NB: dada2 REQUIRES that primers be removed prior to running the denoising scripts.
 
 
 ###Above example
