@@ -363,7 +363,7 @@ library(Biostrings)
 ###DADA2 Pipeline
 
 ```{r}
-path.cut <- "/Users/MacBookPro/Dropbox (Brown)/Active/SIDE) UF Frog Diet/Demultiplexed/cutadapt"
+path.cut <- "cutadapt"
 list.files(path.cut)
 cutFs <- sort(list.files(path.cut, pattern="R1_001.fastq", full.names = TRUE))
 cutRs <- sort(list.files(path.cut, pattern="R2_001.fastq", full.names = TRUE))
@@ -450,19 +450,19 @@ filtFs <- file.path(filt_path, paste0(sample.names, "_F_filt.fastq.gz"))
 filtRs <- file.path(filt_path, paste0(sample.names, "_R_filt.fastq.gz"))
 
 out <- filterAndTrim(fnFs, filtFs, fnRs, filtRs,trimLeft = c(19, 20), truncLen=c(231,230),maxN=0, maxEE=c(2,2), truncQ=2, rm.phix=TRUE, compress=TRUE, multithread=TRUE)
-saveRDS(out, "/gpfs_home/bbrown3/data/bbrown3/MSU_READS/dada_20161227_16S_V4_PE_2/out.rds")
+saveRDS(out, "out.rds")
 
 errF <- learnErrors(filtFs, multithread=TRUE)
 saveRDS(errF, "errF.rds")
 
 errR <- learnErrors(filtRs, multithread=TRUE)
-saveRDS(errR, "/gpfs_home/bbrown3/data/bbrown3/MSU_READS/dada_20161227_16S_V4_PE_2/errR.rds")
+saveRDS(errR, "errR.rds")
 
 derepFs <- derepFastq(filtFs, verbose=TRUE)
-saveRDS(derepFs, "/gpfs_home/bbrown3/data/bbrown3/MSU_READS/dada_20161227_16S_V4_PE_2/derepFs.rds")
+saveRDS(derepFs, "derepFs.rds")
 
 derepRs <- derepFastq(filtRs, verbose=TRUE)
-saveRDS(derepRs, "/gpfs_home/bbrown3/data/bbrown3/MSU_READS/dada_20161227_16S_V4_PE_2/derepRs.rds")
+saveRDS(derepRs, "derepRs.rds")
 
 #Name the derep-class objects by the sample names
 
@@ -471,24 +471,24 @@ names(derepFs) <- sample.names
 names(derepRs) <- sample.names
 
 dadaFs <- dada(derepFs, err=errF, multithread=TRUE)
-saveRDS(dadaFs, "/gpfs_home/bbrown3/data/bbrown3/MSU_READS/dada_20161227_16S_V4_PE_2/dadaFs.rds")
+saveRDS(dadaFs, "dadaFs.rds")
 
 dadaRs <- dada(derepRs, err=errR, multithread=TRUE)
-saveRDS(dadaRs, "/gpfs_home/bbrown3/data/bbrown3/MSU_READS/dada_20161227_16S_V4_PE_2/dadaRs.rds")
+saveRDS(dadaRs, "dadaRs.rds")
 
 mergers <- mergePairs(dadaFs, derepFs, dadaRs, derepRs, verbose=TRUE)
-saveRDS(mergers, "/gpfs_home/bbrown3/data/bbrown3/MSU_READS/dada_20161227_16S_V4_PE_2/mergers.rds")
+saveRDS(mergers, "mergers.rds")
 
 #Inspect the merger data.frame from the first sample
 
 seqtab <- makeSequenceTable(mergers)
-saveRDS(seqtab, "/gpfs_home/bbrown3/data/bbrown3/MSU_READS/dada_20161227_16S_V4_PE_2/seqtab.rds")
+saveRDS(seqtab, "seqtab.rds")
 
 seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE, verbose=TRUE)
-saveRDS(seqtab.nochim, "/gpfs_home/bbrown3/data/bbrown3/MSU_READS/dada_20161227_16S_V4_PE_2/seqtab.nochim.rds")
+saveRDS(seqtab.nochim, "seqtab.nochim.rds")
 
-taxa <- assignTaxonomy(seqtab.nochim, "/users/bbrown3/data/bbrown3/2018_22_03_SMH_microbiome/gg_13_8_train_set_97.fa.gz", multithread=TRUE)
-saveRDS(taxa, "/gpfs_home/bbrown3/data/bbrown3/MSU_READS/dada_20161227_16S_V4_PE_2/taxa.rds")
+taxa <- assignTaxonomy(seqtab.nochim, "gg_13_8_train_set_97.fa.gz", multithread=TRUE)
+saveRDS(taxa, "taxa.rds")
 
 
 
@@ -508,7 +508,7 @@ readRDS("err.rds")
 2. Parts of the script that can be run in parallel: 
 
 dadaRs <- dada(derepRs, err=errR, multithread=TRUE)
-saveRDS(dadaRs, "/gpfs_home/bbrown3/data/bbrown3/MSU_READS/dada_20161227_16S_V4_PE_2/dadaRs.rds")
+saveRDS(dadaRs, "dadaRs.rds")
 
 
 
@@ -543,9 +543,9 @@ Structure of a bash script using cut adapt and dada2
 
 #!/bin/bash
 
-#SBATCH -J dada2_yellow_stone
-#SBATCH -o dada2_yellow_stone_out
-#SBATCH -e dada2_yellow_stone_error
+#SBATCH -J dada2_cutadapt
+#SBATCH -o dada2_cutadapt_out
+#SBATCH -e dada2_cutadapt_error
 #SBATCH -n 8
 #SBATCH --mem=100G
 #SBATCH -t 2-00:00:00
@@ -560,11 +560,11 @@ module load cutadapt
 
 #unzip 
 
-gunzip /gpfs_home/pfreema1/data/pfreema1/YellowstoneTK101_196/*.fastq.gz
+gunzip *.fastq.gz
 
 #cut adapt to remove forward, reverse and their reverse complements. 
 
-for i in /gpfs_home/pfreema1/data/pfreema1/YellowstoneTK101_196/*_R1_001.fastq;
+for i in *_R1_001.fastq;
 
 do
   SAMPLE=$(echo ${i} | sed "s/_R1_\001\.fastq//") 
@@ -575,7 +575,7 @@ done
 
 #run dada2 script on trimmed sequences
 
-Rscript --vanilla --max-ppsize=5000000 dada2_yellow_stone.R
+Rscript --vanilla --max-ppsize=5000000 dada2.R
 
 
 ```
