@@ -74,9 +74,9 @@ Our general bioinformatic workflow uses dada2 to process the fastq files from ea
 
 A similar class of methods developed for 454-scale data was typically used to ‘denoise’ sequencing data prior to constructing OTUs (Quince et al., 2011), while new ASV methods are explicitly intended to replace OTUs as the atomic unit of analysis.
 
-###In this section, we will provide a general strategy for bringing the fastq data files into the dada2 pipeline, completing the denoising steps, and assigning taxonomy to the ASVs. There are two options: (i) to run this code locally on your personal computer or (ii) to run this code on a cluster like "Oscar" at Brown University. 
+### In this section, we will provide a general strategy for bringing the fastq data files into the dada2 pipeline, completing the denoising steps, and assigning taxonomy to the ASVs. There are two options: (i) to run this code locally on your personal computer or (ii) to run this code on a cluster like "Oscar" at Brown University. 
  
-###R
+### R
 
 
 ```
