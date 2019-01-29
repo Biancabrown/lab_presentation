@@ -1,0 +1,122 @@
+---
+title: "Blank"
+author: "Created by Brian Gill"
+date: "11/26/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+rm(list = ls())
+
+library(dada2)
+library("plyr")
+library("ggplot2")
+library("phyloseq")
+devtools::install_github("GuillemSalazar/FastaUtils")
+require(FastaUtils)
+library(ShortRead)
+library(Biostrings)
+```
+###Run Cutadapt Script via terminal
+###Check Cutadapt Script Worked
+
+```{r}
+
+path <- "to fasq files"
+list.files(path)
+
+fnFs <- sort(list.files(path, pattern="R1_001.fastq", full.names = TRUE))
+fnRs <- sort(list.files(path, pattern="R2_001.fastq", full.names = TRUE))
+
+#Change to your primers
+
+FWD <- "GGWACWGGWTGAACWGTWTAYCCYCC"
+REV <- "TANACYTCNGGRTGNCCRAARAAYCA"
+
+allOrients <- function(primer) {
+    # Create all orientations of the input sequence
+    require(Biostrings)
+    dna <- DNAString(primer)  # The Biostrings works w/ DNAString objects rather than character vectors
+    orients <- c(Forward = dna, Complement = complement(dna), Reverse = reverse(dna), 
+        RevComp = reverseComplement(dna))
+    return(sapply(orients, toString))  # Convert back to character vector
+}
+
+FWD.orients <- allOrients(FWD)
+REV.orients <- allOrients(REV)
+
+primerHits <- function(primer, fn) {
+    # Counts number of reads in which the primer is found
+    nhits <- vcountPattern(primer, sread(readFastq(fn)), fixed = FALSE)
+    return(sum(nhits > 0))
+}
+rbind(FWD.ForwardReads = sapply(FWD.orients, primerHits, fn = fnFs[[1]]), 
+    FWD.ReverseReads = sapply(FWD.orients, primerHits, fn = fnRs[[1]]), 
+    REV.ForwardReads = sapply(REV.orients, primerHits, fn = fnFs[[1]]), 
+    REV.ReverseReads = sapply(REV.orients, primerHits, fn = fnRs[[1]]))
+```
+
+```{r setup, include=FALSE}
+
+rm(list = ls())
+
+library(dada2)
+library("plyr")
+library("ggplot2")
+library("phyloseq")
+devtools::install_github("GuillemSalazar/FastaUtils")
+require(FastaUtils)
+library(ShortRead)
+library(Biostrings)
+```
+
+###DADA2 Pipeline
+
+```{r}
+path.cut <- "path to your cut fastq"
+list.files(path.cut)
+cutFs <- sort(list.files(path.cut, pattern="R1_001.fastq", full.names = TRUE))
+cutRs <- sort(list.files(path.cut, pattern="R2_001.fastq", full.names = TRUE))
+
+sample.names <- sapply(strsplit(basename(cutFs), "_"), `[`, 1)
+
+filtFs <- file.path(path.cut, "filtered", basename(cutFs))
+filtRs <- file.path(path.cut, "filtered", basename(cutRs))
+
+out <- filterAndTrim(cutFs, filtFs, cutRs, filtRs, maxN = 0, maxEE = c(2, 2), 
+    truncQ = 2, minLen = , rm.phix = TRUE, compress = TRUE, multithread = TRUE)
+
+errF <- learnErrors(filtFs, multithread=TRUE)
+errR <- learnErrors(filtRs, multithread=TRUE)
+
+derepFs <- derepFastq(filtFs, verbose=TRUE)
+derepRs <- derepFastq(filtRs, verbose=TRUE)
+
+names(derepFs) <- sample.names
+names(derepRs) <- sample.names
+
+dadaFs <- dada(derepFs, err=errF, multithread=TRUE)
+dadaRs <- dada(derepRs, err=errR, multithread=TRUE)
+
+mergers <- mergePairs(dadaFs, derepFs, dadaRs, derepRs, verbose=TRUE)
+
+seqtab <- makeSequenceTable(mergers)
+seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE, verbose=TRUE)
+
+getN <- function(x) sum(getUniques(x))
+track <- cbind(out, sapply(dadaFs, getN), sapply(dadaRs, getN), sapply(mergers, getN), rowSums(seqtab.nochim))
+colnames(track) <- c("input", "filtered", "denoisedF", "denoisedR", "merged", "nonchim")
+rownames(track) <- sample.names
+
+head(track)
+
+barplot(track[,6], cex.names=0.5, las=2)
+
+setwd("~/Desktop")
+save.image("DADA2_Output_2.R")
+```
+
+
+
+
