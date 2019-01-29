@@ -20,7 +20,7 @@ There have been numerous bioinformatic methods recently released that attempt to
 
 
 
-![alt-text-1](/Users/bbrown3/Desktop/primer.jpeg "title-1")
+![alt-text-1](https://raw.githubusercontent.com/Biancabrown/lab_presentation/master/primer.jpeg)
 
 primers are in green and red
 amplicon is in black 
@@ -29,10 +29,10 @@ Total length is 250 bp
 
 ### Seuqencing 
 
-![alt-text-1](/Users/bbrown3/Desktop/image_2.jpeg "title-1")
+![alt-text-1](https://raw.githubusercontent.com/Biancabrown/lab_presentation/master/image_2.jpeg "title-1")
 
 ### Multiple sequences of different amplicons  
-![alt-text-1](/Users/bbrown3/Desktop/image_3.jpeg "title-1")
+![alt-text-1](https://raw.githubusercontent.com/Biancabrown/lab_presentation/master/image_3.jpeg "title-1")
 
 
 
@@ -182,7 +182,8 @@ Main reason:
 
 
 
-![alt-text-1](/Users/bbrown3/Desktop/image_2.jpeg "title-1")
+![alt-text-1](https://raw.githubusercontent.com/Biancabrown/lab_presentation/master/primer.jpeg)
+
 
 
 
@@ -198,14 +199,14 @@ remove sequences that are shorter than those length
 
 
  
-![alt-text-1](/Users/bbrown3/Desktop/image_4.jpeg "title-1")
+![alt-text-1](https://raw.githubusercontent.com/Biancabrown/lab_presentation/master/image_4.jpeg)
 
 
 ###Example Number 2
 
 Image if we had a 300 bp sequences
 
-![alt-text-1](/Users/bbrown3/Desktop/image_5.jpeg "title-1")
+![alt-text-1](https://raw.githubusercontent.com/Biancabrown/lab_presentation/master/image_5.jpeg)
 
 
 We are still doing Miseq 250 paired end
@@ -220,7 +221,7 @@ trim left =c(25,25)
 
 
 
-![alt-text-1](/Users/bbrown3/Desktop/image_6.jpeg "title-1")
+![alt-text-1](https://raw.githubusercontent.com/Biancabrown/lab_presentation/master/image_6.jpeg)
 
 
 
