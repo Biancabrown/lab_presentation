@@ -16,4 +16,4 @@ module load dada2
 
 #run dada2 script on trimmed sequences
 
-Rscript --vanilla --max-ppsize=5000000 dada2_script.R
+Rscript --vanilla --max-ppsize=500000 dada2_script.R
